@@ -1,0 +1,77 @@
+# Copyright (C) 2022  Marcus Rickert
+#
+# See https://github.com/marcus67/snap-proxy-ping
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+name: proxy-ping
+base: core18
+version: '0.1.2.0'
+summary: Simple tool to ping servers behind a firewall that will not let ICMP packages through.
+description: |
+  The utility `ProxyPing` is a simple tool to ping servers behind a firewall that will not let ICMP packages
+  through. It provides a HTTP server answering to ping requests and returning the ping delay as a HTTP text result. The
+  tool will have to be deployed on a server behind the firewall that can be reached by a configurable TCP
+  connection (defaulting to port TCP 6666).
+
+  Suppose the tool is deployed on server `my.proxy.behind.wall` and the server to be pinged is called `some.other.server`
+  the required HTTP query will have to look like this:
+
+      http://my.proxy.behind.wall/api/ping?host=some.other.server
+icon: doc/proxy_ping_logo_128x128.png
+
+grade: stable
+
+confinement: strict
+
+parts:
+  configuration:
+    plugin: dump
+    source: .
+    organize:
+      proxy-ping.config: etc/
+
+  python-app:
+    # See 'snapcraft plugins'
+    plugin: python
+    build-environment:
+      # See https://forum.snapcraft.io/t/error-invalid-command-bdist-wheel/18960/2
+      - PYTHONPATH: "$SNAPCRAFT_PART_INSTALL/usr/lib/python3/dist-packages"
+    source: .
+    build-packages:
+      - python3-dev
+      - libsasl2-dev
+      - libldap2-dev
+      - libssl-dev
+      - python3-wheel
+
+    stage-packages:
+      - python3-dev
+      - libsasl2-dev
+      - libldap2-dev
+      - libssl-dev
+      - python3-wheel
+
+    python-packages:
+      - proxy-ping==0.1.2
+      - python-base-app==0.2.28
+      - some-flask-helpers
+
+apps:
+  test-wrapper-app:
+    command: run-proxy-ping-test-suite
+    plugs: [process-control, network-bind, system-observe]
+  wrapper-app:
+    command: run-proxy-ping
+    daemon: simple
+    restart-condition: always
+    plugs: [process-control, network-bind, system-observe]

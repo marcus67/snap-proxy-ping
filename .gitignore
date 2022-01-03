@@ -1,0 +1,7 @@
+.idea
+*.snap
+parts
+prime
+stage
+*.log
+.coverage
