@@ -7,7 +7,7 @@
 
 ## Overview
 
-There is a snap available to run ProxyPing. See [here](https://github.com/marcus67/proxy_ping) for details
+This is the snap available to run ProxyPing. See [here](https://github.com/marcus67/proxy_ping) for details
 on the application.
 
 Follow these steps to install and configure the snap:
@@ -24,17 +24,29 @@ Follow these steps to install and configure the snap:
  
   where `PORT` is the desired port number.
 
+* Manually connect the required plugs:
+
+      sudo snap connect proxy-ping:network-observe :network-observe
+
 * Restart the snap
 
       sudo snap proxy-ping restart
 
 and you are all set!
 
+## Change History 
+
+See [here](CHANGES.md)
+
 ## Security Details
 
 In order for `ProxyPing` to be able to do its work, the snap has to be allowed to use the 
 following plugs:
 
-* `network-bind`: Obtain permission to bind to the port `PORT` to provide the API calls.
+* `network-observe`: Obtain permission to execute the `ping` binary. 
+  See [here](https://forum.snapcraft.io/t/executing-ping-within-a-snap/1540/2) for details.
 
-This plug is pre-configured for the snap and the `network-bind` plug is automatically connected.
+* `network-bind`: Obtain permission to bind to the port `PORT` to provide the API interface.
+
+These plugs are pre-configured for the snap. However, only the `network-bind` plug is automatically connected. The
+other plug has to be connected manually. See Above.
