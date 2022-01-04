@@ -17,4 +17,4 @@
 mkdir -p $SNAP_DATA/etc
 
 snapctl set log.level="INFO"
-snapctl set port="5555"
+snapctl set port="6666"
